@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda — Projeto Guará</title>
+    <link rel="stylesheet" href="sstyleExplore.css">
+    <link rel="stylesheet" href="stylePrincipal.css">
+    <link rel="stylesheet" href="styleConfig.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="agenda.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <!-- Aba explore e sessões -->
+    <section class="explore">
+        <h1 class="explore__titulo">Explore</h1>
+        <nav class="explore__menuNav">
+            <ul class="explore__menuNav--list">
+                <li class="menuNav__list--item"><a href="index.html"><i></i>Home</a></li>
+                <li class="menuNav__list--item"><a href="#"><i></i>Em breve</a></li>
+                <li class="menuNav__list--item"><a href="#"><i></i>Education</a></li>
+                <li class="menuNav__list--item"><a href="#"><i></i>Science & Tech</a></li>
+                <li class="menuNav__list--item"><a href="#"><i></i>Student Hubs</a></li>
+            </ul>
+        </nav>
+        <footer class="explore__rodape">
+            <img class="explore__rodape--fotoUser" src="img/foto-user.png" alt="foto-user">
+            <span class="explore__rodape--nameUser">Name user</span>
+            <button class="explore__rodape--button"><i class="bx bx-cog"></i></button>
+        </footer>
+    </section>
+
+    <!-- Conteúdo principal da agenda -->
+    <section class="MAIN">
+        <header class="cabecalho">
+            <h1 class="cabecalho--nome">Agenda</h1>
+        </header>
+
+        <section class="principal-agenda-container">
+            <!-- Calendário -->
+            <div class="principal-calendario--agenda" id="calendar">
+                <p style="color:#aaa;text-align:center;padding:20px;">Carregando calendário...</p>
+            </div>
+
+            <!-- Painel lateral: eventos do dia clicado -->
+            <div id="painel-eventos-dia" style="display:none;min-width:280px;max-width:320px;background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,0.1);align-self:flex-start;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                    <h3 id="painel-dia-titulo" style="margin:0;color:#BB6D7B;font-size:15px;"></h3>
+                    <button onclick="document.getElementById('painel-eventos-dia').style.display='none'"
+                        style="background:none;border:none;cursor:pointer;font-size:18px;color:#888;">✕</button>
+                </div>
+                <div id="painel-dia-lista"></div>
+                <button onclick="abrirModalCriar()"
+                    style="width:100%;margin-top:10px;background:#BB6D7B;color:#fff;border:none;border-radius:10px;padding:10px;cursor:pointer;font-size:14px;font-family:'Comfortaa',sans-serif;">
+                    + Adicionar evento neste dia
+                </button>
+            </div>
+        </section>
+
+        <!-- Ordem de aulas de hoje -->
+        <section class="corpo-agenda">
+            <main class="corpo" id="corpo1">
+                <h1 style="color:#5d4b4b;margin-bottom:16px;">Ordem de aulas do dia</h1>
+                <div id="listaAulas">
+                    <p style="color:#aaa;font-size:14px;">Carregando...</p>
+                </div>
+            </main>
+        </section>
+    </section>
+
+    <script src="agenda.js" defer></script>
+</body>
+</html>

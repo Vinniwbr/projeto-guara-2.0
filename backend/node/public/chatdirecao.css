@@ -1,0 +1,79 @@
+body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.corpo1 {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f4dedb;
+}
+
+.cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    min-height: 4rem;
+    background-color: var(--cor1);
+    box-sizing: border-box;
+}
+
+.cabecalho--nome {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--cor3);
+    margin: 0;
+}
+
+.principal-chat-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.chat {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    background-color: var(--cor9);
+}
+
+.rodape {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 4.5rem;
+    padding: 0.7rem 1rem;
+    background-color: #fff;
+    border-top: 0.1rem solid rgba(0, 0, 0, 0.1);
+}
+
+.barra-mensagem {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.input-chat {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: none;
+    border-radius: 999px;
+    background-color: #f1f1f1;
+    outline: none;
+    font-size: 0.95rem;
+    color: #333;
+}
+    
+    
+    
+	
