@@ -1,7 +1,7 @@
 // ============================================================
 // chatdirecao.js — Projeto Guará
 // Chat Direção com Socket.IO em tempo real
-// Token recebido via URL (?token=...)
+// Token recebido via URL (?token=...) ou localStorage
 // ============================================================
 
 const API_URL = window.location.hostname === "localhost"
@@ -172,8 +172,44 @@ function renderizarMensagens(mensagens) {
     return;
   }
 
-  blocoChat.innerHTML = mensagens.map((m) => montarBolha(m)).join("");
+  let ultimaData = null;
+  let html = "";
+
+  mensagens.forEach((m) => {
+    const dataMsg = new Date(m.criado_em).toLocaleDateString("pt-BR");
+    if (dataMsg !== ultimaData) {
+      html += montarSeparadorData(m.criado_em);
+      ultimaData = dataMsg;
+    }
+    html += montarBolha(m);
+  });
+
+  blocoChat.innerHTML = html;
   blocoChat.scrollTop = blocoChat.scrollHeight;
+}
+
+function montarSeparadorData(dataISO) {
+  const d = new Date(dataISO);
+  const hoje = new Date();
+  const ontem = new Date();
+  ontem.setDate(hoje.getDate() - 1);
+
+  let label;
+  if (d.toLocaleDateString("pt-BR") === hoje.toLocaleDateString("pt-BR")) {
+    label = "Hoje";
+  } else if (d.toLocaleDateString("pt-BR") === ontem.toLocaleDateString("pt-BR")) {
+    label = "Ontem";
+  } else {
+    label = d.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
+  }
+
+  return `
+    <div style="display:flex;align-items:center;gap:10px;margin:16px 16px 8px;">
+      <div style="flex:1;height:1px;background:#e0d0d0;"></div>
+      <span style="font-size:11px;color:#aaa;white-space:nowrap;font-weight:bold;">${label}</span>
+      <div style="flex:1;height:1px;background:#e0d0d0;"></div>
+    </div>
+  `;
 }
 
 function adicionarMensagem(msg) {
@@ -184,9 +220,20 @@ function adicionarMensagem(msg) {
   const placeholder = blocoChat.querySelector("p");
   if (placeholder) placeholder.remove();
 
+  // Verifica se precisa adicionar separador de data
+  const dataMsg = new Date(msg.criado_em).toLocaleDateString("pt-BR");
+  const ultimoEl = blocoChat.lastElementChild;
+  if (ultimoEl) {
+    const dataUltima = ultimoEl.dataset.data;
+    if (dataUltima && dataUltima !== dataMsg) {
+      blocoChat.insertAdjacentHTML("beforeend", montarSeparadorData(msg.criado_em));
+    }
+  }
+
   const div = document.createElement("div");
+  div.dataset.data = dataMsg;
   div.innerHTML = montarBolha(msg);
-  blocoChat.appendChild(div.firstElementChild);
+  blocoChat.appendChild(div);
   blocoChat.scrollTop = blocoChat.scrollHeight;
 }
 
