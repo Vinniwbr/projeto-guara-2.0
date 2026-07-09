@@ -133,8 +133,11 @@ body {
 .configuracoes {
     display: none;
     width: 20%;
+    height: 100%;
     background-color: var(--corExplore1);
     box-shadow: #64646f33 -0.6rem 0rem 1.8rem 0rem;
+    position: fixed;
+    margin-left: 80%;
 }
 
 .configuracoes__menuNav--list {
