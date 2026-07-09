@@ -1,0 +1,231 @@
+/* Style para aba explore e config. para ficar padrão em um único arquivo */
+
+/* Style Explore */
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Henny+Penny&display=swap');
+
+:root {
+    --corPadrao: #FFFFFF;
+    --corPadrao2: #000000;
+    --corExplore1: #c16a6195;
+    --corExplore2: #b86054bb;    
+    --corExplore3: #EB8276;
+    --corPrincipal1: #f4dedb;
+    --corPrincipal2: #BC757142;
+    --corTituloPrincipal: #BB6D7B;
+    --corPrincipal4: #0d17a78c;
+    --corPrincipal3: #18a6de91;
+    --corPrincipal5: #0d17a7b2;
+    --corchat1: #c16b61ea;
+    --corGuara: #e32636;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    list-style: none;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    font-family: "Comfortaa", Helvetica, sans-serif;
+}
+
+.explore {
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    box-shadow: #64646f33 0.6rem 0rem 1.8rem 0rem;
+    min-height: 100vh;
+    color: var(--corPadrao);
+    background-color: var(--corExplore1);
+    cursor: default;
+    z-index: 1;
+    position: fixed;
+}
+
+.explore__titulo {
+    font-size: 1.2rem;
+    margin: 1.2rem 0rem 0rem 0.8rem;
+}
+
+.explore__menuNav {
+    font-size: 0.9rem;
+    margin: 1.5rem 0rem 0rem 1rem;
+}
+
+.menuNav__list--item {
+    width: 90%;
+    margin-top: 1.5rem;
+}
+
+.menuNav__list--item.ativo {
+    background-color: var(--corExplore2);
+    color: var(--corPadrao);
+    border-radius: 0.2rem;
+}
+
+.menuNav__list--item a { 
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 0.6rem 0rem 0.6rem 0.3rem;
+    color: var(--corPadrao);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.menuNav__list--item a:hover {
+    background-color: var(--corExplore2);
+    border-radius: 0.2rem;
+    transform: translateY(-2px);
+}
+
+.explore__rodape {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    margin-top: auto;
+    height: 3.1rem;
+    background-color: var(--corExplore3);
+}
+
+.explore__rodape--div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.explore__rodape--fotoUser {
+    height: 1.9rem;
+    width: 1.9rem;
+    border: 0.1rem solid var(--corPadrao2);
+    border-radius: 3.1rem;
+    padding: 0.3rem;
+    margin-left: 0.6rem;
+}
+
+.explore__rodape--nameUser {
+    font-size: 0.7rem;
+    margin-left: 0.3rem;
+    color: var(--corPadrao2);
+}
+
+.explore__rodape--button {
+    border: none;
+    font-size: 1.1rem;
+    margin-right: 0.8rem;
+    background: none;
+    transform: translateY(0.2rem);
+    cursor: pointer;
+    color: var(--corPadrao2);
+}
+
+.explore__rodape--button:hover {
+    color: var(--corPadrao);
+}
+
+/* Style config */
+
+.configuracoes {
+    display: none;
+    width: 20%;
+    background-color: var(--corExplore1);
+    box-shadow: #64646f33 -0.6rem 0rem 1.8rem 0rem;
+}
+
+.configuracoes__menuNav--list {
+    display: flex;
+    justify-content: center;
+    gap: 4rem;
+    padding: 0.5rem;
+    background-color: var(--corExplore3);
+    color: var(--corPadrao1);
+}
+
+.configuracoes__menuNav--list a {
+    color: inherit;
+    transition: 0.1s;
+}
+
+.configuracoes__menuNav--list a:hover {
+    color: var(--corPadrao);
+}
+
+.configuracoes__infoUser {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+
+.configuracoes__infoUser--fotoUser {
+    height: 6rem;
+    width: 6rem;
+    padding: 0.5rem;
+    border: 0.1rem solid var(--corPadrao2);
+    border-radius: 3.1rem;
+}
+
+.configuracoes__infoUser--nomeUser {
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+}
+
+.configuracoes__infoUser--id {
+    font-size: 0.8rem;
+}
+
+.configuracoes__colegas {
+    display: flex;
+    justify-content: space-between;
+    height: 30%;
+    background-color: var(--corExplore2);
+    padding: 1rem;
+    color: var(--corPadrao);
+}
+
+.configuracoes__colegas--titulo {
+    font-size: 1rem;
+}
+
+.configuracoes__colegas--verTudo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--corPadrao);
+    margin-right: 0.2rem;
+    height: 10%;
+    padding: 0.5rem;
+    border-radius: 1rem;
+    transition: 0.3s;
+}
+
+.configuracoes__colegas--verTudo:hover {
+    background-color: var(--corPrincipal1);
+    color: var(--corPadrao2);
+}
+
+.configuracoes__instagram {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: auto;
+    height: 3.1rem;
+    background-color: var(--corExplore3);
+}
+
+.configuracoes__instagram--img {
+    width: 1.5rem;
+    height: auto;
+    margin-left: 1rem;
+}
+
+.configuracoes__instagram--link {
+    color: var(--corPadrao1);
+    font-size: 0.8rem;
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles/styleExplore.css">
+    <link rel="stylesheet" href="../styles/styleConfig.css">
+    <link rel="stylesheet" href="../styles/stylePrincipal.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="../interacaoSite.js" defer></script>
+    <title>Agenda</title>
+</head>
+<body>
+     <!-- Aba explore e sessões -->
+    <section class="explore">
+        <h1 class="explore__titulo">Explore</h1>
+        <nav class="explore__menuNav">
+            <ul class="explore__menuNav--list">
+                <li class="menuNav__list--item ativo"><a href="../index.html"><i></i>Home</a></li>
+                <li class="menuNav__list--item"><a href="../exploreAbas/emBreve.html"><i></i>Em breve</a></li>
+                <li class="menuNav__list--item"><a href="../exploreAbas/education.html"><i></i>Education</a></li>
+                <li class="menuNav__list--item"><a href="../exploreAbas/sobreOProjeto.html"><i></i>Sobre o projeto</a></li>
+                <li class="menuNav__list--item"><a href="../exploreAbas/studentHubs.html"><i></i>Student Hubs</a></li>
+            </ul>
+        </nav>
+
+        <!-- Rodapé -->
+        <footer class="explore__rodape">
+            <img class="explore__rodape--fotoUser" src="img/foto-user.png" alt="foto-user">
+            <span class="explore__rodape--nameUser">Name user</span>
+            <button class="explore__rodape--button"><i class="bx bx-cog"></i></button>
+        </footer>
+    </section>
+    
+    <!-- Calendario---->
+    <section class="MAIN">
+        <header class="cabecalho">
+            <h1 class="cabecalho--nome">Agenda</h1>
+        </header>
+        <section class="principal-agenda-container">
+            <div id="principal-calendario">Calendario</div>
+            <div class="principal-calendario--agenda" id="calendar">Agenda</div>
+        </section>
+    </section>
+    <!-- ordem de aulas (de acordo com o dia de hoje,ja mostrar as aulas,pode ser configurado por profs,diretores)---->
+    <section class="corpo-agenda">
+        <main class="corpo" id="corpo1">
+            <h1>Ordem de aulas do dia</h1>
+            <div id="listaAulas"></div>
+
+            <div id="painelConfiguracaoAulas" class="painel-configuracao" style="display: none;">
+                <h2>Configurar ordem das aulas</h2>
+                <label for="diaAula">Dia</label>
+                <input id="diaAula" type="number" min="1" max="31" placeholder="Ex.: 1">
+                <label for="ordemAulasInput">Digite as aulas em ordem</label>
+                <textarea id="ordemAulasInput" rows="8" placeholder="Ex.: 07:10 - Matemática&#10;08:00 - Português"></textarea>
+                <button id="salvarOrdemAulas" type="button">Salvar ordem</button>
+            </div>
+        </main>
+    </section>
+    
+    <script src="interacoes/agenda.JS" defer></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+# Dependências instaladas via npm — reinstaláveis com "npm install"
+# Nunca devem subir pro GitHub: são pesadas e geradas automaticamente.
+node_modules/
+
+# Logs do npm, caso apareçam
+npm-debug.log*
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# OBS: o .env NÃO está sendo ignorado de propósito (decisão do projeto).
+# Lembre-se: como ele contém senhas e segredos, mantenha o repositório
+# SEMPRE privado no GitHub.

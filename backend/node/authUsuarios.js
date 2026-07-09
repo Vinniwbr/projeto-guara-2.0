@@ -59,12 +59,7 @@ async function loginOuCadastroGoogle(perfilGoogle) {
 // ─── Gera o JWT que o frontend vai guardar e enviar nas requisições ─
 function gerarToken(usuario) {
   return jwt.sign(
-    {
-      usuarioId: usuario.id,
-      email: usuario.email,
-      nome: usuario.nome,
-      papel: usuario.papel || "aluno",
-    },
+    { usuarioId: usuario.id, email: usuario.email, nome: usuario.nome },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRA_EM }
   );

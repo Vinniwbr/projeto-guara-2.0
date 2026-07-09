@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/emBreve.css">
+    <!-- Padrão para todas as abas -->
+    <link rel="stylesheet" href="../styles/styleFixo.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="../interacaoSite.js" defer></script>    
+    <title>Guará</title>
+</head>
+<body>
+    <!-- Padrão para todas as abas enquanto não é feito com JS essa mudança -->
+    <!-- Aba explore e sessões -->
+    <section class="explore">
+        <h1 class="explore__titulo">Explore</h1>
+        <nav class="explore__menuNav">
+            <ul class="explore__menuNav--list">
+                <li class="menuNav__list--item"><a href="../index.html"><i></i>Home</a></li>
+                <li class="menuNav__list--item ativo"><a href="#"><i></i>Em breve</a></li>
+                <li class="menuNav__list--item"><a href="education.html"><i></i>Education</a></li>
+                <li class="menuNav__list--item"><a href="sobreOProjeto.html"><i></i>Sobre o projeto</a></li>
+                <li class="menuNav__list--item"><a href="studentHubs.html"><i></i>Student Hubs</a></li>
+            </ul>
+        </nav>
+
+        <!-- Rodapé -->
+        <footer class="explore__rodape">
+            <div class="explore__rodape--div">
+                <img class="explore__rodape--fotoUser" src="../img/foto-user.png" alt="foto-user">
+                <h1 class="explore__rodape--nameUser">Name user</h1>
+            </div>
+            <button class="explore__rodape--button"><i class="bx bx-cog"></i></button>
+        </footer>
+    </section>
+
+    <!-- Em breve -->
+    <main class="emBreve universal">
+        <h2 class="emBreve__titulo">Novos projetos em breve!</h2>
+        <p class="emBreve__paragrafo">Fique ligado nas novidades...</p>
+    </main>
+
+    <!-- Padrão para todas as abas enquanto não é feito com JS essa mudança -->
+    <!-- Aba configurações do user -->
+    <section class="configuracoes">
+        <nav class="configuracoes__menuNav">
+            <ul class="configuracoes__menuNav--list">
+                <li class="menuNavCon__list--item"><a href="#"><i class="bx bx-bell"></i></a></li>
+                <li class="menuNavCon__list--item"><a href="#"><i class="bx bx-message"></i></a></li>
+                <li class="menuNavCon__list--item"><a href="#"><i class="bx bx-cog"></i></a></li>
+            </ul>
+        </nav>
+        <!-- Informações user -->
+        <div class="configuracoes__infoUser" href="#">
+            <img class="configuracoes__infoUser--fotoUser" src="../img/foto-user.png" alt="foto-user">
+            <span class="configuracoes__infoUser--nomeUser">Nome user</span>
+            <span class="configuracoes__infoUser--id">@user</span>
+        </div>
+        <!-- Novos membros -->
+        <div class="configuracoes__novosMembros" href="#">
+            <h1 class="configuracoes__novosMembros--titulo">Novos Membros</h1>
+            <a class="configuracoes__novosMembros--verTudo" href="#">Ver tudo</a>
+        </div>
+        <!-- instagram -->
+        <div class="configuracoes__instagram" href="#">
+            <img class="configuracoes__instagram--img" src="../img/logo-insta.png" alt="logo-instagram">
+            <a class="configuracoes__instagram--link" href="#">@instagram-user</a>
+        </div>
+    </section>
+</body>
+</html>

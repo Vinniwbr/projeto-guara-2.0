@@ -1,26 +1,27 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChatAluno</title>
-    <link rel="stylesheet" href="styleExplore.css">
-    <link rel="stylesheet" href="stylePrincipal.css">
-    <link rel="stylesheet" href="styleConfig.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="chatdirecao.css"> <!-- O mesmo css(por enquanto vai ser o mesmo que foi usado para a direcao por questao de organizacao)-->
+    <link rel="stylesheet" href="../styles/styleExplore.css">
+    <link rel="stylesheet" href="../styles/styleConfig.css">
+    <link rel="stylesheet" href="../styles/stylePrincipal.css">
+    <link rel="stylesheet" href="../styles/chatdirecao.css"> <!-- O mesmo css(por enquanto vai ser o mesmo que foi usado para a direcao por questao de organizacao)-->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="interacoes/interacaoSite.js" defer></script>
+    <title>Chat Direção</title>
 </head>
 <body>
+    <!-- Aba de chats e sessões -->
     <section class="explore">
         <h1 class="explore__titulo">Explore</h1>
         <nav class="explore__menuNav">
             <ul class="explore__menuNav--list">
-                <li class="menuNav__list--item"><a href="#"><i></i>Home</a></li>
-                <li class="menuNav__list--item"><a href="#"><i></i>Em breve</a></li>
-                <li class="menuNav__list--item"><a href="#"><i></i>Education</a></li>
-                <li class="menuNav__list--item"><a href="#"><i></i>Science & Tech</a></li>
-                <li class="menuNav__list--item"><a href="#"><i></i>Student Hubs</a></li>
+                <li class="menuNav__list--item ativo"><a href="../index.html"><i></i>Home</a></li>
+                <li class="menuNav__list--item"><a href="../exploreAbas/emBreve.html"><i></i>Em breve</a></li>
+                <li class="menuNav__list--item"><a href="../exploreAbas/education.html"><i></i>Education</a></li>
+                <li class="menuNav__list--item"><a href="../exploreAbas/sobreOProjeto.html"><i></i>Sobre o projeto</a></li>
+                <li class="menuNav__list--item"><a href="../exploreAbas/studentHubs.html"><i></i>Student Hubs</a></li>
 
             </ul>
         </nav>
@@ -45,6 +46,5 @@
                 <input type="text" class="input-chat" placeholder="Digite uma mensagem...">
             </div>
         </footer>
-    
 </body>
 </html>

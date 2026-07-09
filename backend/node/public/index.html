@@ -5,12 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!--Links para arquivos de estilização-->
-    <link rel="stylesheet" href="styleExplore.css">
-    <link rel="stylesheet" href="stylePrincipal.css">
-    <link rel="stylesheet" href="styleConfig.css">
+    <link rel="stylesheet" href="styles/styleFixo.css">
+    <link rel="stylesheet" href="styles/stylePrincipal.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <script src="iteracaoSite.js" defer></script>
-    <script src="app2.js" defer></script>
+    <script src="interacaoSite.js" defer></script>
     <title>Guará</title>
 </head>
 
@@ -20,34 +18,38 @@
         <h1 class="explore__titulo">Explore</h1>
         <nav class="explore__menuNav">
             <ul class="explore__menuNav--list">
-                <li class="menuNav__list--item"><a href="#"><i></i>Home</a></li>
-                <li class="menuNav__list--item"><a href="#"><i></i>Em breve</a></li>
-                <li class="menuNav__list--item"><a href="#"><i></i>Education</a></li>
-                <li class="menuNav__list--item"><a href="#"><i></i>Science & Tech</a></li>
-                <li class="menuNav__list--item"><a href="#"><i></i>Student Hubs</a></li>
+                <li class="menuNav__list--item ativo"><a href="#"><i></i>Home</a></li>
+                <li class="menuNav__list--item"><a href="exploreAbas/emBreve.html"><i></i>Em breve</a></li>
+                <li class="menuNav__list--item"><a href="exploreAbas/education.html"><i></i>Education</a></li>
+                <li class="menuNav__list--item"><a href="exploreAbas/sobreOProjeto.html"><i></i>Sobre o projeto</a></li>
+                <li class="menuNav__list--item"><a href="exploreAbas/studentHubs.html"><i></i>Student Hubs</a></li>
             </ul>
         </nav>
 
         <!-- Rodapé -->
         <footer class="explore__rodape">
-            <img class="explore__rodape--fotoUser" src="img/foto-user.png" alt="foto-user">
-            <span class="explore__rodape--nameUser">Name user</span>
+            <div class="explore__rodape--div">
+                <img class="explore__rodape--fotoUser" src="img/foto-user.png" alt="foto-user">
+                <h1 class="explore__rodape--nameUser">Name user</h1>
+            </div>
             <button class="explore__rodape--button"><i class="bx bx-cog"></i></button>
         </footer>
     </section>
 
     <!-- Aba Principal, chats -->
-    <main class="principal">
+    <main class="principal universal">
         <!-- cabeçalho -->
         <header class="principal__cabecalho">
-            <img class="principal__cabecalho--imagemGuara" src="img/img-guara.png" alt="imagem-guara">
-            <h1 class="principal__cabecalho--nomeProjeto">Projeto Guará</h1>
+            <div class="principal__cabecalho--div">
+                <img class="principal__cabecalho--imagemGuara" src="img/img-guara.png" alt="imagem-guara">
+                <h1 class="principal__cabecalho--nomeProjeto">Projeto Guará</h1>
+            </div>
             <img class="principal__cabecalho--logoLindaura" src="img/logo-lindaura.png" alt="logo-lindaura">
         </header>
         <!-- Sessão superior -->
         <section class="principal__superior">
             <!-- chat Direção -->
-            <a class="principal__superior--chatDirecao" href="Chatdirecao.html">
+            <a class="principal__superior--chatDirecao" href="principalAbas/Chatdirecao.html">
                 <h1 class="superior__chatDirecao--titulo">Chat Direção</h1>
                 <p class="superior__chatDirecao--paragrafo">Chat direcionado a coordenação, diretoria e profissionais
                     da
@@ -56,7 +58,7 @@
                 <span class="superior__chatDirecao--members"><i></i>345.678 Members</span>
             </a>
             <!-- agenda -->
-            <a class="principal__superior--agenda" href="Agenda.html">
+            <a class="principal__superior--agenda" href="principalAbas/Agenda.html">
                 <h1 class="superior__agenda--titulo">Agenda</h1>
                 <p class="superior__agenda--paragrafo">Aqui ficarão os avisos e atividades com notificação de
                     prioridade
@@ -68,7 +70,7 @@
         <!-- Sessão inferior -->
         <section class="principal__inferior">
             <!-- chat Turma -->
-            <a class="principal__inferior--chatTurma" href="ChatAluno.html">
+            <a class="principal__inferior--chatTurma" href="#">
                 <h1 class="inferior__chatTurma--titulo">Chat Turma xxx</h1>
                 <p class="inferior__chatTurma--paragrafo">Chat usado apenas para a turma</p>
                 <span class="inferior__chatTurma--members"><i></i>42 Members</span>
@@ -98,15 +100,15 @@
             <span class="configuracoes__infoUser--id">@user</span>
         </div>
         <!-- Novos membros -->
-        <div class="configuracoes__novosMembros" href="#">
-            <h1 class="configuracoes__novosMembros--titulo">Novos Membros</h1>
-            <a class="configuracoes__novosMembros--verTudo" href="#">Ver tudo</a>
+        <div class="configuracoes__colegas" href="#">
+            <h1 class="configuracoes__colegas--titulo">Colegas de turma</h1>
+            <a class="configuracoes__colegas--verTudo" href="#">Ver tudo</a>
         </div>
         <!-- instagram -->
-        <div class="configuracoes__instagram" href="#">
+        <footer class="configuracoes__instagram" href="#">
             <img class="configuracoes__instagram--img" src="img/logo-insta.png" alt="logo-instagram">
             <a class="configuracoes__instagram--link" href="#">@instagram-user</a>
-        </div>
+        </footer>
     </section>
+
 </body>
-</html>

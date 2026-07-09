@@ -41,7 +41,6 @@ async function buscarPerfilGoogle(code) {
     nome: data.name,
     email: data.email,
     fotoUrl: data.picture,
-    papel: data.papel || "aluno",
   };
 }
 

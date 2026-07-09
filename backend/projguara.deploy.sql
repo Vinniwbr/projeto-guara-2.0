@@ -50,6 +50,8 @@ CREATE TABLE vinculo_escola (
     CONSTRAINT fk_vinculo_turma FOREIGN KEY (id_turma)       REFERENCES turmas(id_turma)             ON DELETE CASCADE,
     CONSTRAINT uq_vinculo       UNIQUE (id_funcionario, id_disciplina, id_turma)
 );
+<<<<<<< HEAD
+=======
 
 -- migracao_turmas.sql
 -- Adiciona papel (professor/aluno) e estrutura de vínculo de turmas
@@ -79,3 +81,4 @@ CREATE TABLE IF NOT EXISTS turma_membros (
  
 -- ─── Exemplo: promover um usuário a professor manualmente ────
 -- UPDATE usuarios SET papel = 'professor' WHERE email = 'professor@escola.com';
+>>>>>>> 7bfefb1350720da835f546c572ae7b03d89b18ab

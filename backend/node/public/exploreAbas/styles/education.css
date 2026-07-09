@@ -1,0 +1,85 @@
+body{
+    margin: 0;
+    padding: 0;
+}
+
+.education {
+    margin-left: 20%;
+}
+
+.education__cabecalho {
+    display: flex;
+    height: 9.5rem;
+    background-color: var(--corPrincipal2);
+    width: 100vw;
+}
+.education__cabecalho--titulo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    margin-right: 3.5rem;
+    font-size: 1.9rem;
+}
+
+.education__cabecalho--paragrafo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--corTituloPrincipal);
+}
+
+.education__sobreColegio {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.education__sobreColegio--titulo {
+    height: 1.2rem;
+    color: var(--corTituloPrincipal);
+}
+
+.education__sobreColegio--mapa{
+    margin-top: 20px;
+}
+.education__sobreColegio--paragrafo{
+    margin-top: 30px;
+}
+
+.education__maisSobre {
+    display: flex;
+    margin-top: 60px;
+}
+
+.education__maisSobre--titulo{
+    display: flex;
+    flex-direction: column;
+    margin-right: 20px;
+    color: var(--corTituloPrincipal);
+}
+
+.education__maisSobre--list{
+    display: block;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.education__maisSobre--list-item::before {
+    content: "➜";
+    color: var(--corTituloPrincipal);
+}
+
+.infra{
+    display: inline;
+
+}
+.education__maisSobre--infra{
+    display: flex;
+    justify-content: left;
+    color: var(--corTituloPrincipal);
+}
+
+.education__rodape {
+    background-color: var(--corExplore2);
+    display: flex;
+    justify-content: center;
+}

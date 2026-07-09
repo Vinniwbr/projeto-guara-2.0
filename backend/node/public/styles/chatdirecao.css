@@ -5,6 +5,7 @@ body {
 }
 
 .corpo1 {
+    margin-left: 20%;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -19,14 +20,14 @@ body {
     width: 100%;
     padding: 1rem 1.5rem;
     min-height: 4rem;
-    background-color: var(--cor1);
+    background-color: var(--cor9);
     box-sizing: border-box;
 }
 
 .cabecalho--nome {
     font-size: 1.5rem;
     font-weight: bold;
-    color: var(--cor3);
+    color: var(--cor0);
     margin: 0;
 }
 
@@ -44,7 +45,7 @@ body {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    background-color: var(--cor9);
+    background-color: var(--cor1);
 }
 
 .rodape {
@@ -54,7 +55,7 @@ body {
     min-height: 4.5rem;
     padding: 0.7rem 1rem;
     background-color: #fff;
-    border-top: 0.1rem solid rgba(0, 0, 0, 0.1);
+    border-top: 0.1rem solid var(--cor1);
 }
 
 .barra-mensagem {
