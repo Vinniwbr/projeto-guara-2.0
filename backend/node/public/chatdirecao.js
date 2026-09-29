@@ -1,14 +1,13 @@
 // ============================================================
 // chatdirecao.js — Projeto Guará
 // Chat Direção com Socket.IO em tempo real
-// Token recebido via URL (?token=...) ou localStorage
+// Sem login: usa o usuário padrão da API
 // ============================================================
 
 const API_URL = window.location.hostname === "localhost"
   ? "http://localhost:3000"
   : "https://projeto-guara-api.onrender.com";
 
-let token        = null;
 let usuarioAtual = null;
 let socket       = null;
 let chatId       = null; // ID do chat "direção" no banco
@@ -16,7 +15,6 @@ let chatId       = null; // ID do chat "direção" no banco
 // ─── Utilitário: requisições à API ────────────────────────────
 async function apiFetch(path, opcoes = {}) {
   const headers = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(API_URL + path, { headers, ...opcoes });
   if (!res.ok) {
     let msg = `HTTP ${res.status}`;
@@ -36,36 +34,16 @@ function formatarHora(dataISO) {
 // ═══════════════════════════════════════════════════════════════
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // 1) Lê token da URL ou localStorage
-  const params = new URLSearchParams(window.location.search);
-  token = params.get("token") || localStorage.getItem("guara_token");
-
-  if (token) {
-    localStorage.setItem("guara_token", token);
-    if (params.has("token")) {
-      const url = new URL(window.location);
-      url.searchParams.delete("token");
-      window.history.replaceState({}, "", url);
-    }
-  }
-
-  if (!token) {
-    mostrarErro("Você precisa estar logado para acessar o chat.");
-    return;
-  }
-
-  // 2) Carrega usuário
+  // 1) Carrega o usuário padrão
   try {
     usuarioAtual = await apiFetch("/usuarios/me");
     atualizarPerfil();
   } catch (err) {
-    mostrarErro("Sessão expirada. Faça login novamente.");
-    token = null;
-    localStorage.removeItem("guara_token");
+    mostrarErro("Não foi possível carregar o usuário padrão.");
     return;
   }
 
-  // 3) Busca o chat de tipo "direcao" no banco
+  // 2) Busca o chat de tipo "direcao" no banco
   try {
     const chats = await apiFetch("/chats");
     const chatDirecao = chats.find((c) => c.tipo === "direcao");
@@ -79,13 +57,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // 4) Inicializa Socket.IO
+  // 3) Inicializa Socket.IO
   inicializarSocket();
 
-  // 5) Carrega mensagens iniciais
+  // 4) Carrega mensagens iniciais
   await carregarMensagens();
 
-  // 6) Configura o botão/input de envio
+  // 5) Configura o botão/input de envio
   configurarEnvio();
 });
 
@@ -350,7 +328,7 @@ function mostrarErro(msg) {
     blocoChat.innerHTML = `
       <div style="text-align:center;padding:40px 20px;">
         <p style="color:#EA444F;font-size:14px;margin-bottom:16px;">${msg}</p>
-        <a href="${API_URL}/auth/login/google" style="background:#BB6D7B;color:#fff;padding:10px 20px;border-radius:10px;text-decoration:none;font-size:14px;">Entrar com Google</a>
+        <a href="index.html" style="background:#BB6D7B;color:#fff;padding:10px 20px;border-radius:10px;text-decoration:none;font-size:14px;">Voltar para o início</a>
       </div>
     `;
   }

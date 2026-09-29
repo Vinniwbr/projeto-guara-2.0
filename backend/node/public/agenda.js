@@ -8,7 +8,6 @@ const API_URL = window.location.hostname === "localhost"
   : "https://projeto-guara-api.onrender.com";
 
 // ─── Estado global ────────────────────────────────────────────
-let token        = localStorage.getItem("guara_token");
 let usuarioAtual = null;
 let googleStatus = null;
 let eventosCache = [];
@@ -18,7 +17,6 @@ let eventoEditando = null;     // evento sendo editado (null = criando novo)
 // ─── Utilitário: requisições à API ────────────────────────────
 async function apiFetch(path, opcoes = {}) {
   const headers = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(API_URL + path, { headers, ...opcoes });
   if (!res.ok) {
     let msg = `HTTP ${res.status}`;
@@ -51,47 +49,30 @@ function toInputDatetime(dataISO) {
 // ═══════════════════════════════════════════════════════════════
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // Carrega token da URL se vier do login
-  const params = new URLSearchParams(window.location.search);
-  const tokenUrl = params.get("token");
-  if (tokenUrl) {
-    token = tokenUrl;
-    localStorage.setItem("guara_token", token);
-    const url = new URL(window.location);
-    url.searchParams.delete("token");
-    window.history.replaceState({}, "", url);
-  }
-
   criarModal();
   criarBotaoCriarEvento();
-
-  if (!token) {
-    mostrarAvisoLogin();
-    renderizarCalendario(); // mostra calendário vazio mesmo sem login
-    return;
-  }
 
   try {
     usuarioAtual = await apiFetch("/usuarios/me");
     atualizarPerfil();
   } catch (err) {
-    console.warn("Sessão expirada:", err.message);
-    token = null;
-    localStorage.removeItem("guara_token");
-    mostrarAvisoLogin();
-    renderizarCalendario();
-    return;
+    console.warn("Não foi possível carregar usuário padrão:", err.message);
+    usuarioAtual = {
+      id: "local",
+      nome: "Visitante Guara",
+      username: "visitante",
+      foto_url: "img/foto-user.png",
+    };
+    atualizarPerfil();
   }
 
-  try {
-    googleStatus = await apiFetch(`/usuarios/${usuarioAtual.id}/google/status`);
-  } catch (_) {
-    googleStatus = { conectado: false };
-  }
+  googleStatus = { conectado: false };
 
   if (!googleStatus?.conectado) {
-    mostrarAvisoGoogle();
+    carregarEventosLocais();
+    mostrarAvisoAgendaLocal();
     renderizarCalendario();
+    renderizarAulasHoje();
     return;
   }
 
@@ -115,26 +96,29 @@ function atualizarPerfil() {
 // AVISOS (sem login / sem Google conectado)
 // ═══════════════════════════════════════════════════════════════
 
-function mostrarAvisoLogin() {
+function mostrarAvisoAgendaLocal() {
   const container = document.querySelector(".principal-agenda-container");
   if (!container) return;
   const aviso = document.createElement("div");
   aviso.style.cssText = "background:#fff3e0;border-radius:12px;padding:20px 30px;margin-bottom:20px;text-align:center;color:#b25400;font-size:15px;";
-  aviso.innerHTML = `⚠️ Você precisa fazer login para ver sua agenda. <a href="${API_URL}/auth/login/google" style="color:#4A6FA5;font-weight:bold;">Entrar com Google</a>`;
+  aviso.textContent = "Agenda local ativada. Seus eventos ficam salvos neste navegador, sem login.";
   container.insertAdjacentElement("beforebegin", aviso);
 }
 
-function mostrarAvisoGoogle() {
-  const container = document.querySelector(".principal-agenda-container");
-  if (!container) return;
-  const aviso = document.createElement("div");
-  aviso.style.cssText = "background:#fff3e0;border-radius:12px;padding:20px 30px;margin-bottom:20px;text-align:center;color:#b25400;font-size:15px;";
-  aviso.innerHTML = `📅 Conecte sua conta Google para sincronizar a agenda. <a href="#" id="btn-conectar-google" style="color:#4A6FA5;font-weight:bold;">Conectar Google Agenda</a>`;
-  container.insertAdjacentElement("beforebegin", aviso);
-  document.getElementById("btn-conectar-google")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    window.location.href = `${API_URL}/auth/google?token=${token}`;
-  });
+function carregarEventosLocais() {
+  try {
+    eventosCache = JSON.parse(localStorage.getItem("guara_eventos_locais") || "[]");
+  } catch (_) {
+    eventosCache = [];
+  }
+}
+
+function salvarEventosLocais() {
+  localStorage.setItem("guara_eventos_locais", JSON.stringify(eventosCache));
+}
+
+function usandoAgendaLocal() {
+  return !googleStatus?.conectado;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -357,13 +341,6 @@ function criarModal() {
 }
 
 function abrirModalCriar(preenchido = {}) {
-  if (!usuarioAtual) { alert("Faça login primeiro."); return; }
-  if (!googleStatus?.conectado) {
-    alert("Conecte sua conta Google Agenda primeiro.");
-    window.location.href = `${API_URL}/auth/google?token=${token}`;
-    return;
-  }
-
   eventoEditando = null;
   document.getElementById("modal-titulo").textContent = "Novo Evento";
   document.getElementById("ev-titulo").value      = "";
@@ -437,6 +414,7 @@ async function salvarEvento() {
   btn.disabled = true;
 
   const corpo = {
+    id: eventoEditando?.id || `local-${Date.now()}`,
     titulo,
     inicio: new Date(inicio).toISOString(),
     fim:    new Date(fim).toISOString(),
@@ -446,7 +424,16 @@ async function salvarEvento() {
   };
 
   try {
-    if (eventoEditando) {
+    if (usandoAgendaLocal()) {
+      if (eventoEditando) {
+        eventosCache = eventosCache.map((ev) =>
+          ev.id === eventoEditando.id ? { ...corpo, id: eventoEditando.id } : ev,
+        );
+      } else {
+        eventosCache.push(corpo);
+      }
+      salvarEventosLocais();
+    } else if (eventoEditando) {
       // Por enquanto a API não tem rota PUT/PATCH de evento — deleta e recria
       await apiFetch(`/usuarios/${usuarioAtual.id}/eventos/${eventoEditando.id}`, { method: "DELETE" });
       await apiFetch(`/usuarios/${usuarioAtual.id}/eventos`, {
@@ -461,7 +448,7 @@ async function salvarEvento() {
     }
 
     fecharModal();
-    await carregarEventos();
+    if (!usandoAgendaLocal()) await carregarEventos();
     renderizarCalendario();
     renderizarAulasHoje();
     mostrarToast(eventoEditando ? "Evento atualizado com sucesso! ✅" : "Evento criado com sucesso! ✅");
@@ -479,11 +466,19 @@ async function salvarEvento() {
 // ═══════════════════════════════════════════════════════════════
 
 async function deletarEvento(eventoId) {
-  if (!confirm("Tem certeza que deseja deletar este evento? Ele será removido da sua agenda do Google.")) return;
+  const mensagem = usandoAgendaLocal()
+    ? "Tem certeza que deseja deletar este evento local?"
+    : "Tem certeza que deseja deletar este evento? Ele será removido da sua agenda do Google.";
+  if (!confirm(mensagem)) return;
 
   try {
-    await apiFetch(`/usuarios/${usuarioAtual.id}/eventos/${eventoId}`, { method: "DELETE" });
-    await carregarEventos();
+    if (usandoAgendaLocal()) {
+      eventosCache = eventosCache.filter((ev) => ev.id !== eventoId);
+      salvarEventosLocais();
+    } else {
+      await apiFetch(`/usuarios/${usuarioAtual.id}/eventos/${eventoId}`, { method: "DELETE" });
+      await carregarEventos();
+    }
     renderizarCalendario();
     renderizarAulasHoje();
 

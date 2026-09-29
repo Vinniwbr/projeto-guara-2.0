@@ -10,7 +10,6 @@ const API_URL =
 		: "https://projeto-guara-api.onrender.com";
 
 // ─── Estado global ────────────────────────────────────────────
-let token = null;
 let usuarioAtual = null;
 let chatAtivo = null;
 let chatsCache = [];
@@ -21,7 +20,6 @@ let socket = null; // conexão Socket.IO
 // ─── Utilitário: requisições à API ────────────────────────────
 async function apiFetch(path, opcoes = {}) {
 	const headers = { "Content-Type": "application/json" };
-	if (token) headers["Authorization"] = `Bearer ${token}`;
 	const res = await fetch(API_URL + path, { headers, ...opcoes });
 	if (!res.ok) {
 		let msg = `HTTP ${res.status}`;
@@ -44,44 +42,23 @@ function formatarHora(dataISO) {
 // ═══════════════════════════════════════════════════════════════
 
 document.addEventListener("DOMContentLoaded", async () => {
-	// 1) Lê token da URL (?token=...) ou do localStorage
-	const params = new URLSearchParams(window.location.search);
-	token = params.get("token") || localStorage.getItem("guara_token");
+	// 1) Carrega o usuário padrão. O app não exige login.
+	await carregarUsuario();
 
-	if (token) {
-		localStorage.setItem("guara_token", token);
-		if (params.has("token")) {
-			const url = new URL(window.location);
-			url.searchParams.delete("token");
-			window.history.replaceState({}, "", url);
-		}
-	}
-
-	// 2) Carrega dados do usuário logado
-	if (token) {
-		try {
-			await carregarUsuario();
-		} catch (err) {
-			console.warn("Token inválido ou expirado — limpando sessão.");
-			token = null;
-			localStorage.removeItem("guara_token");
-		}
-	}
-
-	// 3) Inicializa Socket.IO
+	// 2) Inicializa Socket.IO
 	inicializarSocket();
 
-	// 4) Monta o modal de chat
+	// 3) Monta o modal de chat
 	criarModal();
 
-	// 5) Carrega tudo em paralelo
+	// 4) Carrega tudo em paralelo
 	await Promise.all([
 		atualizarInterfaceUsuario(),
 		carregarStatusGoogle(),
 		carregarChats(),
 	]);
 
-	// 6) Carrega eventos da agenda se o Google estiver conectado
+	// 5) Carrega eventos da agenda se o Google estiver conectado
 	if (googleStatus?.conectado && usuarioAtual) {
 		await carregarEventos();
 	}
@@ -178,8 +155,7 @@ function atualizarInterfaceUsuario() {
 		if (configNome) configNome.textContent = nome;
 		if (configId) configId.textContent = `@${username}`;
 	} else {
-		if (footerNome)
-			footerNome.innerHTML = `<a href="${API_URL}/auth/login/google" style="color:white;text-decoration:underline;font-size:13px;">Entrar com Google</a>`;
+		if (footerNome) footerNome.textContent = "Visitante";
 		if (configNome) configNome.textContent = "Convidado";
 		if (configId) configId.textContent = "@guest";
 	}
@@ -190,16 +166,7 @@ function atualizarInterfaceUsuario() {
 // ═══════════════════════════════════════════════════════════════
 
 async function carregarStatusGoogle() {
-	if (!usuarioAtual?.id) {
-		googleStatus = { conectado: false };
-		atualizarCardAgenda();
-		return;
-	}
-	try {
-		googleStatus = await apiFetch(`/usuarios/${usuarioAtual.id}/google/status`);
-	} catch (_) {
-		googleStatus = { conectado: false };
-	}
+	googleStatus = { conectado: false };
 	atualizarCardAgenda();
 }
 
@@ -231,26 +198,17 @@ function atualizarCardAgenda() {
 
 	if (!usuarioAtual) {
 		if (concluidas) concluidas.innerHTML = `<i></i>—`;
-		if (espera)
-			espera.innerHTML = `<i></i><a href="${API_URL}/auth/login/google" style="color:#fff;text-decoration:underline;">Entrar com Google</a>`;
-		if (paragrafo) paragrafo.textContent = "Faça login para ver sua agenda.";
+		if (espera) espera.innerHTML = `<i></i>Agenda local`;
+		if (paragrafo) paragrafo.textContent = "Agenda disponível sem login.";
 		return;
 	}
 
 	if (!googleStatus?.conectado) {
-		if (concluidas) concluidas.innerHTML = `<i></i>❌ Não conectada`;
-		if (espera)
-			espera.innerHTML = `<i></i>🔗 <a href="#" id="conectar-google" style="color:#fff;text-decoration:underline;">Conectar Google Agenda</a>`;
+		if (concluidas) concluidas.innerHTML = `<i></i>Agenda local`;
+		if (espera) espera.innerHTML = `<i></i>Sem login necessário`;
 		if (paragrafo)
 			paragrafo.textContent =
-				"Conecte sua conta Google para sincronizar eventos.";
-		const link = document.getElementById("conectar-google");
-		if (link)
-			link.addEventListener("click", (e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				conectarGoogle();
-			});
+				"Abra a agenda para ver e organizar eventos sem autenticação.";
 		return;
 	}
 
@@ -301,14 +259,10 @@ function atualizarCardAgenda() {
 
 function conectarGoogle() {
 	if (!usuarioAtual?.id) {
-		alert("Faça login primeiro.");
+		alert("Usuário padrão ainda não carregou.");
 		return;
 	}
-	if (!token) {
-		window.location.href = `${API_URL}/auth/login/google`;
-		return;
-	}
-	window.location.href = `${API_URL}/auth/google?token=${token}`;
+	window.location.href = `${API_URL}/auth/google?usuario_id=${usuarioAtual.id}`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -594,7 +548,7 @@ async function enviarMensagem() {
 	if (!texto || !chatAtivo) return;
 
 	if (!usuarioAtual?.id) {
-		alert("Você precisa estar logado para enviar mensagens.");
+		alert("Usuário padrão ainda não carregou.");
 		return;
 	}
 

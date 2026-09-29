@@ -7,12 +7,6 @@ const cors = require("cors");
 const turmasService = require("./turmas");
 const http = require("http");
 const { inicializarSocket, notificarNovaMensagem } = require("./socket");
-const { gerarUrlLogin, buscarPerfilGoogle } = require("./googleLogin");
-const {
-	loginOuCadastroGoogle,
-	gerarToken,
-	exigirLogin,
-} = require("./authUsuarios");
 const jwt = require("jsonwebtoken");
 
 if (process.env.NODE_ENV !== "production") {
@@ -20,12 +14,33 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const pool = require("./db");
-const { gerarUrlAutenticacao, criarOAuthClient } = require("./googleAuth");
-const googleCalendar = require("./googleCalendar");
 const app = express();
 const servidorHttp = http.createServer(app);
 const io = inicializarSocket(servidorHttp);
 const PORT = process.env.PORT || 3000;
+const CHATS_PADRAO = [
+	{
+		id: 1,
+		nome: "Chat Direção",
+		tipo: "direcao",
+		criado_em: new Date().toISOString(),
+		total_membros: 1,
+	},
+	{
+		id: 2,
+		nome: "Chat Turma",
+		tipo: "turma",
+		criado_em: new Date().toISOString(),
+		total_membros: 1,
+	},
+	{
+		id: 3,
+		nome: "Chat amigável",
+		tipo: "amigavel",
+		criado_em: new Date().toISOString(),
+		total_membros: 1,
+	},
+];
 
 // ─── Middlewares ─────────────────────────────────────────────
 
@@ -40,24 +55,71 @@ function erroServidor(res, err, msg = "Erro interno do servidor") {
 	return res.status(500).json({ erro: msg });
 }
 
+function carregarIntegracaoGoogle() {
+	const { gerarUrlAutenticacao, criarOAuthClient } = require("./googleAuth");
+	const googleCalendar = require("./googleCalendar");
+	return { gerarUrlAutenticacao, criarOAuthClient, googleCalendar };
+}
+
+function bancoConfigurado() {
+	return Boolean(
+		process.env.DB_HOST &&
+			process.env.DB_PORT &&
+			process.env.DB_NAME &&
+			process.env.DB_USER &&
+			process.env.DB_PASSWORD,
+	);
+}
+
+async function buscarOuCriarUsuarioPadrao() {
+	if (!bancoConfigurado()) return usuarioPadraoLocal();
+
+	const resultado = await pool.query(
+		"SELECT id, nome, username, email, foto_url, papel FROM usuarios WHERE username = $1 LIMIT 1",
+		["visitante"],
+	);
+	if (resultado.rows.length > 0) return resultado.rows[0];
+
+	const criado = await pool.query(
+		`INSERT INTO usuarios (nome, username, email, foto_url, papel)
+     VALUES ($1, $2, $3, $4, $5)
+     ON CONFLICT (username) DO UPDATE SET nome = EXCLUDED.nome
+     RETURNING id, nome, username, email, foto_url, papel`,
+		[
+			"Visitante Guara",
+			"visitante",
+			"visitante@projetoguara.local",
+			"img/foto-user.png",
+			"aluno",
+		],
+	);
+	return criado.rows[0];
+}
+
+function usuarioPadraoLocal() {
+	return {
+		id: 1,
+		nome: "Visitante Guara",
+		username: "visitante",
+		email: "visitante@projetoguara.local",
+		foto_url: "img/foto-user.png",
+		papel: "aluno",
+	};
+}
+
 // ============================================================
 // ROTAS — USUÁRIOS
 // ============================================================
 
-// GET /usuarios/me — retorna os dados do usuário logado (JWT)
+// GET /usuarios/me — retorna um usuário padrão sem exigir login
 // IMPORTANTE: deve ficar ANTES de /usuarios/:id
-app.get("/usuarios/me", exigirLogin, async (req, res) => {
+app.get("/usuarios/me", async (_req, res) => {
 	try {
-		const resultado = await pool.query(
-			"SELECT id, nome, username, email, foto_url FROM usuarios WHERE id = $1",
-			[req.usuario.usuarioId],
-		);
-		if (resultado.rows.length === 0) {
-			return res.status(404).json({ erro: "Usuário não encontrado." });
-		}
-		res.json(resultado.rows[0]);
+		const usuario = await buscarOuCriarUsuarioPadrao();
+		res.json(usuario);
 	} catch (err) {
-		erroServidor(res, err, "Erro ao buscar usuário logado");
+		console.warn("Banco indisponível; usando usuário padrão local:", err.message);
+		res.json(usuarioPadraoLocal());
 	}
 });
 
@@ -107,6 +169,8 @@ app.get("/usuarios/:id", async (req, res) => {
 // ============================================================
 
 app.get("/chats", async (req, res) => {
+	if (!bancoConfigurado()) return res.json(CHATS_PADRAO);
+
 	try {
 		const resultado = await pool.query(`
       SELECT c.id, c.nome, c.tipo, c.criado_em,
@@ -118,11 +182,18 @@ app.get("/chats", async (req, res) => {
     `);
 		res.json(resultado.rows);
 	} catch (err) {
-		erroServidor(res, err, "Erro ao listar chats");
+		console.warn("Banco indisponível; usando chats padrão:", err.message);
+		res.json(CHATS_PADRAO);
 	}
 });
 
 app.get("/chats/:id", async (req, res) => {
+	if (!bancoConfigurado()) {
+		const chat = CHATS_PADRAO.find((item) => String(item.id) === String(req.params.id));
+		if (!chat) return res.status(404).json({ erro: "Chat não encontrado." });
+		return res.json(chat);
+	}
+
 	try {
 		const resultado = await pool.query("SELECT * FROM chats WHERE id = $1", [
 			req.params.id,
@@ -132,7 +203,10 @@ app.get("/chats/:id", async (req, res) => {
 		}
 		res.json(resultado.rows[0]);
 	} catch (err) {
-		erroServidor(res, err, "Erro ao buscar chat");
+		const chat = CHATS_PADRAO.find((item) => String(item.id) === String(req.params.id));
+		if (!chat) return res.status(404).json({ erro: "Chat não encontrado." });
+		console.warn("Banco indisponível; usando chat padrão:", err.message);
+		res.json(chat);
 	}
 });
 
@@ -142,6 +216,8 @@ app.get("/chats/:id", async (req, res) => {
 
 app.get("/chats/:id/mensagens", async (req, res) => {
 	const limite = parseInt(req.query.limite) || 50;
+	if (!bancoConfigurado()) return res.json([]);
+
 	try {
 		const resultado = await pool.query(
 			`
@@ -157,7 +233,8 @@ app.get("/chats/:id/mensagens", async (req, res) => {
 		);
 		res.json(resultado.rows);
 	} catch (err) {
-		erroServidor(res, err, "Erro ao buscar mensagens");
+		console.warn("Banco indisponível; retornando chat vazio:", err.message);
+		res.json([]);
 	}
 });
 
@@ -171,6 +248,21 @@ app.post("/chats/:id/mensagens", async (req, res) => {
 	if (texto.trim().length === 0) {
 		return res.status(400).json({ erro: "Mensagem não pode ser vazia." });
 	}
+	if (!bancoConfigurado()) {
+		const mensagem = {
+			id: Date.now(),
+			chat_id: Number(req.params.id),
+			usuario_id: Number(usuario_id),
+			texto: texto.trim(),
+			criado_em: new Date().toISOString(),
+			autor: "Visitante Guara",
+			username: "visitante",
+			foto_url: "img/foto-user.png",
+		};
+		notificarNovaMensagem(req.params.id, mensagem);
+		return res.status(201).json(mensagem);
+	}
+
 	try {
 		const chat = await pool.query("SELECT id FROM chats WHERE id = $1", [
 			req.params.id,
@@ -200,7 +292,19 @@ app.post("/chats/:id/mensagens", async (req, res) => {
 		notificarNovaMensagem(req.params.id, completa.rows[0]);
 		res.status(201).json(completa.rows[0]);
 	} catch (err) {
-		erroServidor(res, err, "Erro ao enviar mensagem");
+		const mensagem = {
+			id: Date.now(),
+			chat_id: Number(req.params.id),
+			usuario_id: Number(usuario_id),
+			texto: texto.trim(),
+			criado_em: new Date().toISOString(),
+			autor: "Visitante Guara",
+			username: "visitante",
+			foto_url: "img/foto-user.png",
+		};
+		console.warn("Banco indisponível; mensagem mantida apenas em tempo real:", err.message);
+		notificarNovaMensagem(req.params.id, mensagem);
+		res.status(201).json(mensagem);
 	}
 });
 
@@ -324,15 +428,11 @@ app.get("/turmas/:id/membros", async (req, res) => {
 // ROTAS — GOOGLE CALENDAR (Agenda)
 // ============================================================
 
-// GET /auth/google — inicia a autorização do Google Calendar
-// Aceita token JWT de 3 formas:
-//   1) ?token=...       (redirect do browser, usado pelo frontend)
-//   2) Authorization: Bearer ...  (chamadas fetch/Postman)
-//   3) ?usuario_id=...  (fallback de desenvolvimento)
+// GET /auth/google — inicia a autorização do Google Calendar sem exigir login
 app.get("/auth/google", async (req, res) => {
 	let usuarioId = null;
 
-	// 1) Token via query string
+	// Token via query string mantido apenas por compatibilidade com links antigos.
 	if (req.query.token) {
 		try {
 			const dados = jwt.verify(req.query.token, process.env.JWT_SECRET);
@@ -342,7 +442,7 @@ app.get("/auth/google", async (req, res) => {
 		}
 	}
 
-	// 2) Token via header Authorization
+	// Token via header Authorization mantido apenas por compatibilidade com links antigos.
 	if (!usuarioId && req.headers.authorization?.startsWith("Bearer ")) {
 		try {
 			const tkn = req.headers.authorization.split(" ")[1];
@@ -353,17 +453,20 @@ app.get("/auth/google", async (req, res) => {
 		}
 	}
 
-	// 3) Fallback: usuario_id direto na query (desenvolvimento)
 	if (!usuarioId && req.query.usuario_id) {
 		usuarioId = req.query.usuario_id;
 	}
 
 	if (!usuarioId) {
-		return res
-			.status(401)
-			.json({ erro: "Autenticação necessária. Faça login primeiro." });
+		try {
+			const usuario = await buscarOuCriarUsuarioPadrao();
+			usuarioId = usuario.id;
+		} catch (err) {
+			return erroServidor(res, err, "Erro ao preparar usuário padrão");
+		}
 	}
 
+	const { gerarUrlAutenticacao } = carregarIntegracaoGoogle();
 	const url = gerarUrlAutenticacao(usuarioId);
 	res.redirect(url);
 });
@@ -380,6 +483,7 @@ app.get("/auth/google/callback", async (req, res) => {
 	}
 
 	try {
+		const { criarOAuthClient, googleCalendar } = carregarIntegracaoGoogle();
 		const oauth2Client = criarOAuthClient();
 		const { tokens } = await oauth2Client.getToken(code);
 		await googleCalendar.salvarTokens(usuarioId, tokens);
@@ -392,6 +496,7 @@ app.get("/auth/google/callback", async (req, res) => {
 // GET /usuarios/:id/google/status
 app.get("/usuarios/:id/google/status", async (req, res) => {
 	try {
+		const { googleCalendar } = carregarIntegracaoGoogle();
 		const tokens = await googleCalendar.buscarTokens(req.params.id);
 		res.json({ conectado: !!tokens });
 	} catch (err) {
@@ -402,6 +507,7 @@ app.get("/usuarios/:id/google/status", async (req, res) => {
 // GET /usuarios/:id/eventos
 app.get("/usuarios/:id/eventos", async (req, res) => {
 	try {
+		const { googleCalendar } = carregarIntegracaoGoogle();
 		const eventos = await googleCalendar.listarEventos(req.params.id);
 		res.json(eventos);
 	} catch (err) {
@@ -426,6 +532,7 @@ app.post("/usuarios/:id/eventos", async (req, res) => {
 			.json({ erro: "titulo, inicio e fim são obrigatórios." });
 	}
 	try {
+		const { googleCalendar } = carregarIntegracaoGoogle();
 		const evento = await googleCalendar.criarEvento(req.params.id, req.body);
 		res.status(201).json(evento);
 	} catch (err) {
@@ -444,6 +551,7 @@ app.post("/usuarios/:id/eventos", async (req, res) => {
 // DELETE /usuarios/:id/eventos/:eventoId
 app.delete("/usuarios/:id/eventos/:eventoId", async (req, res) => {
 	try {
+		const { googleCalendar } = carregarIntegracaoGoogle();
 		await googleCalendar.apagarEvento(req.params.id, req.params.eventoId);
 		res.json({ mensagem: "Evento apagado com sucesso." });
 	} catch (err) {
@@ -459,29 +567,9 @@ app.delete("/usuarios/:id/eventos/:eventoId", async (req, res) => {
 	}
 });
 
-// ============================================================
-// ROTAS — LOGIN COM GOOGLE
-// ============================================================
-
-app.get("/auth/login/google", (req, res) => {
-	const url = gerarUrlLogin();
-	res.redirect(url);
-});
-
-app.get("/auth/login/google/callback", async (req, res) => {
-	const { code, error } = req.query;
-	if (error) {
-		return res.redirect(`/login-erro.html?motivo=${encodeURIComponent(error)}`);
-	}
-	try {
-		const perfilGoogle = await buscarPerfilGoogle(code);
-		const usuario = await loginOuCadastroGoogle(perfilGoogle);
-		const token = gerarToken(usuario);
-		res.redirect(`/index.html?token=${token}`);
-	} catch (err) {
-		erroServidor(res, err, "Erro ao concluir login com Google");
-	}
-});
+// Links antigos de login passam direto para o app.
+app.get("/auth/login/google", (_req, res) => res.redirect("/index.html"));
+app.get("/auth/login/google/callback", (_req, res) => res.redirect("/index.html"));
 
 // ─── Rota raiz — painel de status ────────────────────────────
 app.get("/", (req, res) => {
@@ -508,9 +596,8 @@ app.get("/", (req, res) => {
         <li><code>GET  /chats/:id/mensagens</code> — mensagens de um chat</li>
         <li><code>POST /chats/:id/mensagens</code> — enviar mensagem</li>
         <li><code>POST /usuarios</code> — criar usuário</li>
-        <li><code>GET  /usuarios/me</code> — usuário logado (JWT)</li>
-        <li><code>GET  /auth/login/google</code> — login com Google</li>
-        <li><code>GET  /auth/google</code> — conectar agenda Google</li>
+        <li><code>GET  /usuarios/me</code> — usuário padrão sem login</li>
+        <li><code>GET  /auth/google</code> — conectar agenda Google opcional</li>
         <li><code>GET  /health</code> — health check JSON</li>
       </ul>
       <p>Teste rápido: <a href="/health">/health</a> | <a href="/chats">/chats</a></p>

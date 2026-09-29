@@ -86,7 +86,7 @@ Deve aparecer:
 
 - `http://localhost:3000/health` → `{"status":"ok"}`
 - `http://localhost:3000/chats` → `[]` ou lista de chats (confirma banco OK)
-- `http://localhost:3000/auth/login/google` → fluxo de login Google
+- `http://localhost:3000/index.html` → aplicação sem login obrigatório
 - `http://localhost:3000/teste_chat_socket.html` → chat em tempo real (se a
   pasta `public` com o arquivo de teste também foi copiada)
 
